@@ -1,24 +1,98 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Systems and Automation]]></title>
-  <link href="http://blog.fretzel.net/atom.xml" rel="self"/>
-  <link href="http://blog.fretzel.net/"/>
-  <updated>2014-06-08T00:03:17-05:00</updated>
-  <id>http://blog.fretzel.net/</id>
-  <author>
-    <name><![CDATA[Kent Holloway]]></name>
-    
-  </author>
-  <generator uri="http://octopress.org/">Octopress</generator>
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Multi-master Puppet Setup With DNS SRV Records - Systems and Automation</title>
+  <meta name="author" content="Kent Holloway">
 
   
-  <entry>
-    <title type="html"><![CDATA[Multi-master Puppet Setup With DNS SRV Records]]></title>
-    <link href="http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/"/>
-    <updated>2014-02-21T21:00:00-06:00</updated>
-    <id>http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records</id>
-    <content type="html"><![CDATA[<p>I recently switched from a single Puppet master to a Multi-master setup which consists of a single CA server and 2 new masters.
+  <meta name="description" content="I recently switched from a single Puppet master to a Multi-master setup which consists of a single CA server and 2 new masters.
+During this change I &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Systems and Automation" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Systems and Automation</a></h1>
+  
+    <h2>stuff I like</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.fretzel.net" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Multi-master Puppet Setup With DNS SRV Records</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-21T21:00:00-06:00" pubdate data-updated="true">Feb 21<span>st</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I recently switched from a single Puppet master to a Multi-master setup which consists of a single CA server and 2 new masters.
 During this change I also took the time to upgrade my clients (and server) from 2.7.25 to 3.4.2 and Ruby from 1.8.7 to 2.0.0p353 oh and I also switched over to the new DNS SRV records setup.</p>
 
 <p>While I&rsquo;m not going to rehash the entire setup and all steps taken to get there I do want to include some high level steps that were not exactly clear after reading the Puppet labs docs on multi-master setups. Hopefully this helps others trying to accomplish the same thing.</p>
@@ -101,7 +175,102 @@ Run the agent, it should automatically switch over to the new CA and masters and
 <pre><code> [main]
   pluginsource = puppet:///plugins
 </code></pre>
-]]></content>
-  </entry>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-</feed>
+
+<span class="byline author vcard">Posted by <span class="fn">Kent Holloway</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-21T21:00:00-06:00" pubdate data-updated="true">Feb 21<span>st</span>, 2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/" data-via="" data-counturl="http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/">Multi-master Puppet Setup With DNS SRV Records</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Kent Holloway -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

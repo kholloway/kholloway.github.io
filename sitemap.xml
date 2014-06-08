@@ -1,12 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+        <loc>
+            http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/
+        </loc>
+        <lastmod>2014-06-08T00:02:28-05:00</lastmod>
+    </url>
+    <url>
         <loc>http://blog.fretzel.net/blog/archives/</loc>
-        <lastmod>2014-06-07T23:32:25-05:00</lastmod>
+        <lastmod>2014-06-08T00:02:28-05:00</lastmod>
     </url>
     <url>
         <loc>http://blog.fretzel.net/</loc>
-        <lastmod>2014-06-07T23:32:25-05:00</lastmod>
+        <lastmod>2014-06-08T00:02:28-05:00</lastmod>
     </url>
     <url>
         <loc>http://blog.fretzel.net/robots.txt</loc>
