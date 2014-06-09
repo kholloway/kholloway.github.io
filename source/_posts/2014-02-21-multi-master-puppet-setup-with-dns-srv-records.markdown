@@ -2,8 +2,8 @@
 layout: post
 title: "Multi-master Puppet setup with DNS SRV records"
 date: 2014-02-21 22:00:00 -0500
-comments: false
-categories: 
+comments: true
+categories: [Puppet, Ruby]
 ---
 I recently switched from a single Puppet master to a Multi-master setup which consists of a single CA server and 2 new masters.
 During this change I also took the time to upgrade my clients (and server) from 2.7.25 to 3.4.2 and Ruby from 1.8.7 to 2.0.0p353 oh and I also switched over to the new DNS SRV records setup.

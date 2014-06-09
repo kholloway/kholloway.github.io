@@ -1,0 +1,12 @@
+---
+layout: post
+title: "SVN to Git"
+date: 2013-03-04 08:23:58 -0500
+comments: true
+categories: [Git, Subversion, SVN]
+---
+SVN -> Git:
+
+ Good post by Makis about how to setup SVN to Git conversions.
+
+[Transferring-svn-repository-to-git](http://blog.sofistes.net/2010/07/transferring-svn-repository-to.html)
