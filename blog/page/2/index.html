@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Audio Fingerprinting on Raspberry Pi (Part 1) - Systems and Automation</title>
+  <title>Systems and Automation</title>
   <meta name="author" content="Kent Holloway">
 
   
-  <meta name="description" content="A short guide on how to do some basic audio fingerprinting on a Raspberry Pi also known as “my quest to notify myself when the dryer is done”.
-Lets &hellip;">
+  <meta name="description" content="SVN &ndash;> Git: Good post by Makis about how to setup SVN to Git conversions. Transferring-svn-repository-to-git
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ Lets &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1">
+  <link rel="canonical" href="http://blog.fretzel.net/blog/page/2">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Systems and Automation" type="application/atom+xml">
@@ -76,12 +76,15 @@ Lets &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article class="hentry" role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
     
-      <h1 class="entry-title">Audio Fingerprinting on Raspberry Pi (Part 1)</h1>
+      <h1 class="entry-title"><a href="/blog/2013/03/04/svn-to-git/">SVN to Git</a></h1>
     
     
       <p class="meta">
@@ -97,137 +100,33 @@ Lets &hellip;">
   
 
 
-<time datetime="2014-03-05T17:15:43-06:00" pubdate data-updated="true">Mar 5<span>th</span>, 2014</time>
+<time datetime="2013-03-04T07:23:58-06:00" pubdate data-updated="true">Mar 4<span>th</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>A short guide on how to do some basic audio fingerprinting on a Raspberry Pi also known as “my quest to notify myself when the dryer is done”.
-Lets start with the excellent Chromaprint library.
-Build Chromaprint on Pi</p>
+  <div class="entry-content"><p>SVN &ndash;> Git:</p>
 
-<p>Install pre-reqs:</p>
+<p> Good post by Makis about how to setup SVN to Git conversions.</p>
 
-<pre><code>sudo apt-get install libboost1.50-all-dev ffmpeg libtag1-dev zlib1g-dev resample libresample1-dev cmake libffms2-dev  
-</code></pre>
-
-<p>Download package from Chromaprint source</p>
-
-<pre><code>mkdir /opt/src
-cd /opt/src
-wget https://bitbucket.org/acoustid/chromaprint/downloads/chromaprint-1.1.tar.gz
-tar -zxvf chromaprint-1.1.tar.gz
-cd chromaprint\*
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s" -DBUILD_TOOLS=ON
-make
-sudo make install
-</code></pre>
-
-<p>Python stuff</p>
-
-<p>If you don’t already have PIP installed go grab it:</p>
-
-<pre><code>sudo easy_install pip
-</code></pre>
-
-<p>Build/install Python packages now:</p>
-
-<pre><code>sudo pip install pyacoustid audioread
-</code></pre>
-
-<p>Create a test WAV file 10 seconds in length of whatever audio sound/noise/whatever that you want to fingerprint.
-In this case I’m using my USB microphone plugged into the Pi since there is no onboard microphone or audio input (and no analog inputs either).
-You can also use the PyAudio package you installed to record the wav file.</p>
-
-<pre><code>arecord -D plughw:1,0 -d 10 -r 44100 --channels=2 --format=cd /tmp/test.wav
-</code></pre>
-
-<p>Fingerprint your wave file (in python). Note: You can just as easily use ‘fpcalc’ in the shell to get a compressed or raw fingerprint from chromaprint libs.</p>
-
-<pre><code>import chromaprint
-import acoustid
-duration, fingerprint = acoustid.fingerprint_file('/tmp/test.wav')
-fp_raw = chromaprint.decode_fingerprint(fingerprint)[0]
-print "Compressed fingerprint: %s" % fingerprint
-print "Raw fingerprint: %s" % fp_raw
-</code></pre>
-
-<p>If all went well you should not have seen any errors and your compressed and raw fingerprint should have been printed to the screen.
-If you fingerprint only had “AQAA” in it then something is wrong with your chromaprint library.
-The available libchromaprint packages along with the python-pyaudio package did not work for me at all and consistently resulted in no fingerprints.
-Instead building the custom chromaprint libs and then installing pyaudio via pip resulted in a working setup.</p>
-
-<p>If you do have fingerprint errors make sure your wav file is not empty and if it’s not empty then try to do a clean build on the chromprint libs and re-install.</p>
-
-<p>Note: The example ‘fpcalc’ won’t actually build from the 1.1 chromaprint libs. It throws some strange compiler errors that I couldn’t resolve.</p>
-
-<p>I’m going to be recording 2 10 second files in a loop and that can be a bit hard on the SD card in the Raspberry Pi so instead I’m using the built in TMPFS location in /run so I don’t do a lot of unnecessary writes to the SD card.</p>
-
-<p>That’s all for now, come back for part 2 where I wrap it all up into a single script that records in a thread while analyzing the previous recording and sending notifications when matches are found.</p>
+<p><a href="http://blog.sofistes.net/2010/07/transferring-svn-repository-to.html">Transferring-svn-repository-to-git</a></p>
 </div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Kent Holloway</span></span>
-
-      
-
-
-
-
-
-
-
-
   
 
 
-<time datetime="2014-03-05T17:15:43-06:00" pubdate data-updated="true">Mar 5<span>th</span>, 2014</time>
-      
-
-<span class="categories">
+    </article>
   
-    <a class='category' href='/blog/categories/audio/'>Audio</a>, <a class='category' href='/blog/categories/python/'>Python</a>, <a class='category' href='/blog/categories/raspberry-pi/'>Raspberry Pi</a>
-  
-</span>
-
-
-    </p>
+  <div class="pagination">
     
-      <div class="sharing">
-  
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/" data-via="" data-counturl="http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/" >Tweet</a>
-  
-  
-  
-</div>
-
+    <a href="/blog/archives">Blog Archives</a>
     
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/" title="Previous Post: Multi-master Puppet setup with DNS SRV records">&laquo; Multi-master Puppet setup with DNS SRV records</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2014/06/08/new-blog-home-and-software/" title="Next Post: New blog home and software">New blog home and software &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
 </div>
-  </section>
-
-</div>
-
 <aside class="sidebar">
   
     <section>
@@ -251,7 +150,7 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
       </li>
     
       <li class="post">
-        <a href="/blog/2013/12/05/vim-in-all-its-awesomeness/">Vim in All It's Awesomeness</a>
+        <a href="/blog/2013/12/05/vim-in-all-its-awesomeness/">Vim in All It&#8217;s Awesomeness</a>
       </li>
     
   </ul>
@@ -260,7 +159,7 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating...</li>
+    <li class="loading">Status updating&#8230;</li>
   </ul>
   
   <a href="https://github.com/kholloway">@kholloway</a> on GitHub
@@ -289,7 +188,7 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
 
 <section>
   <h1>My Pinboard</h1>
-  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
   <p><a href="http://pinboard.in/u:sanity">My Pinboard Bookmarks &raquo;</a></p>
 </section>
 <script type="text/javascript">
@@ -311,7 +210,6 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
   
 </aside>
 
-
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -326,10 +224,7 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
       var disqus_shortname = 'sysat';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/';
-        var disqus_url = 'http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -4,7 +4,7 @@
   <title><![CDATA[Systems and Automation]]></title>
   <link href="http://blog.fretzel.net/atom.xml" rel="self"/>
   <link href="http://blog.fretzel.net/"/>
-  <updated>2014-06-08T20:03:10-05:00</updated>
+  <updated>2014-06-08T20:14:35-05:00</updated>
   <id>http://blog.fretzel.net/</id>
   <author>
     <name><![CDATA[Kent Holloway]]></name>
@@ -12,6 +12,47 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vundle for Vim]]></title>
+    <link href="http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/"/>
+    <updated>2014-06-08T20:08:14-05:00</updated>
+    <id>http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim</id>
+    <content type="html"><![CDATA[<p>I have a new favorite Vim plugin manager called <a href="https://github.com/gmarik/Vundle.vim">Vundle</a>.</p>
+
+<p>It&rsquo;s simple and doesn&rsquo;t have all the overhead of some of the other Vim plugin managers/pref bundles.</p>
+
+<p>I&rsquo;m only using a small handful of plugins (shown below)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Bundle 'SuperTab'
+</span><span class='line'>
+</span><span class='line'>" Repos from GitHub
+</span><span class='line'>Bundle 'bling/vim-airline'
+</span><span class='line'>Bundle 'tpope/vim-fugitive'
+</span><span class='line'>Bundle 'davidhalter/jedi-vim'
+</span><span class='line'>Bundle 'rodjek/vim-puppet'
+</span><span class='line'>Bundle 'elzr/vim-json'
+</span><span class='line'>
+</span><span class='line'>" installed bundles go here
+</span><span class='line'>Bundle 'Syntastic'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Vundle has been going through some upgrades lately which is making it even easier to use.</p>
+
+<p>Take 10 minutes and check it out.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[New Blog Home and Software]]></title>

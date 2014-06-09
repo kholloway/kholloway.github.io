@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Audio Fingerprinting on Raspberry Pi (Part 1) - Systems and Automation</title>
+  <title>Vundle for Vim - Systems and Automation</title>
   <meta name="author" content="Kent Holloway">
 
   
-  <meta name="description" content="A short guide on how to do some basic audio fingerprinting on a Raspberry Pi also known as “my quest to notify myself when the dryer is done”.
-Lets &hellip;">
+  <meta name="description" content="I have a new favorite Vim plugin manager called Vundle. It&rsquo;s simple and doesn&rsquo;t have all the overhead of some of the other Vim plugin &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ Lets &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1">
+  <link rel="canonical" href="http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Systems and Automation" type="application/atom+xml">
@@ -81,7 +80,7 @@ Lets &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Audio Fingerprinting on Raspberry Pi (Part 1)</h1>
+      <h1 class="entry-title">Vundle for Vim</h1>
     
     
       <p class="meta">
@@ -97,75 +96,46 @@ Lets &hellip;">
   
 
 
-<time datetime="2014-03-05T17:15:43-06:00" pubdate data-updated="true">Mar 5<span>th</span>, 2014</time>
+<time datetime="2014-06-08T20:08:14-05:00" pubdate data-updated="true">Jun 8<span>th</span>, 2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>A short guide on how to do some basic audio fingerprinting on a Raspberry Pi also known as “my quest to notify myself when the dryer is done”.
-Lets start with the excellent Chromaprint library.
-Build Chromaprint on Pi</p>
+<div class="entry-content"><p>I have a new favorite Vim plugin manager called <a href="https://github.com/gmarik/Vundle.vim">Vundle</a>.</p>
 
-<p>Install pre-reqs:</p>
+<p>It&rsquo;s simple and doesn&rsquo;t have all the overhead of some of the other Vim plugin managers/pref bundles.</p>
 
-<pre><code>sudo apt-get install libboost1.50-all-dev ffmpeg libtag1-dev zlib1g-dev resample libresample1-dev cmake libffms2-dev  
-</code></pre>
+<p>I&rsquo;m only using a small handful of plugins (shown below)</p>
 
-<p>Download package from Chromaprint source</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Bundle 'SuperTab'
+</span><span class='line'>
+</span><span class='line'>" Repos from GitHub
+</span><span class='line'>Bundle 'bling/vim-airline'
+</span><span class='line'>Bundle 'tpope/vim-fugitive'
+</span><span class='line'>Bundle 'davidhalter/jedi-vim'
+</span><span class='line'>Bundle 'rodjek/vim-puppet'
+</span><span class='line'>Bundle 'elzr/vim-json'
+</span><span class='line'>
+</span><span class='line'>" installed bundles go here
+</span><span class='line'>Bundle 'Syntastic'</span></code></pre></td></tr></table></div></figure>
 
-<pre><code>mkdir /opt/src
-cd /opt/src
-wget https://bitbucket.org/acoustid/chromaprint/downloads/chromaprint-1.1.tar.gz
-tar -zxvf chromaprint-1.1.tar.gz
-cd chromaprint\*
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s" -DBUILD_TOOLS=ON
-make
-sudo make install
-</code></pre>
 
-<p>Python stuff</p>
+<p>Vundle has been going through some upgrades lately which is making it even easier to use.</p>
 
-<p>If you don’t already have PIP installed go grab it:</p>
-
-<pre><code>sudo easy_install pip
-</code></pre>
-
-<p>Build/install Python packages now:</p>
-
-<pre><code>sudo pip install pyacoustid audioread
-</code></pre>
-
-<p>Create a test WAV file 10 seconds in length of whatever audio sound/noise/whatever that you want to fingerprint.
-In this case I’m using my USB microphone plugged into the Pi since there is no onboard microphone or audio input (and no analog inputs either).
-You can also use the PyAudio package you installed to record the wav file.</p>
-
-<pre><code>arecord -D plughw:1,0 -d 10 -r 44100 --channels=2 --format=cd /tmp/test.wav
-</code></pre>
-
-<p>Fingerprint your wave file (in python). Note: You can just as easily use ‘fpcalc’ in the shell to get a compressed or raw fingerprint from chromaprint libs.</p>
-
-<pre><code>import chromaprint
-import acoustid
-duration, fingerprint = acoustid.fingerprint_file('/tmp/test.wav')
-fp_raw = chromaprint.decode_fingerprint(fingerprint)[0]
-print "Compressed fingerprint: %s" % fingerprint
-print "Raw fingerprint: %s" % fp_raw
-</code></pre>
-
-<p>If all went well you should not have seen any errors and your compressed and raw fingerprint should have been printed to the screen.
-If you fingerprint only had “AQAA” in it then something is wrong with your chromaprint library.
-The available libchromaprint packages along with the python-pyaudio package did not work for me at all and consistently resulted in no fingerprints.
-Instead building the custom chromaprint libs and then installing pyaudio via pip resulted in a working setup.</p>
-
-<p>If you do have fingerprint errors make sure your wav file is not empty and if it’s not empty then try to do a clean build on the chromprint libs and re-install.</p>
-
-<p>Note: The example ‘fpcalc’ won’t actually build from the 1.1 chromaprint libs. It throws some strange compiler errors that I couldn’t resolve.</p>
-
-<p>I’m going to be recording 2 10 second files in a loop and that can be a bit hard on the SD card in the Raspberry Pi so instead I’m using the built in TMPFS location in /run so I don’t do a lot of unnecessary writes to the SD card.</p>
-
-<p>That’s all for now, come back for part 2 where I wrap it all up into a single script that records in a thread while analyzing the previous recording and sending notifications when matches are found.</p>
+<p>Take 10 minutes and check it out.</p>
 </div>
 
 
@@ -188,12 +158,12 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
   
 
 
-<time datetime="2014-03-05T17:15:43-06:00" pubdate data-updated="true">Mar 5<span>th</span>, 2014</time>
+<time datetime="2014-06-08T20:08:14-05:00" pubdate data-updated="true">Jun 8<span>th</span>, 2014</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/audio/'>Audio</a>, <a class='category' href='/blog/categories/python/'>Python</a>, <a class='category' href='/blog/categories/raspberry-pi/'>Raspberry Pi</a>
+    <a class='category' href='/blog/categories/vim/'>Vim</a>, <a class='category' href='/blog/categories/vundle/'>Vundle</a>
   
 </span>
 
@@ -202,7 +172,7 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/" data-via="" data-counturl="http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/" data-via="" data-counturl="http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/" >Tweet</a>
   
   
   
@@ -211,10 +181,8 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/" title="Previous Post: Multi-master Puppet setup with DNS SRV records">&laquo; Multi-master Puppet setup with DNS SRV records</a>
+        <a class="basic-alignment left" href="/blog/2014/06/08/new-blog-home-and-software/" title="Previous Post: New blog home and software">&laquo; New blog home and software</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2014/06/08/new-blog-home-and-software/" title="Next Post: New blog home and software">New blog home and software &raquo;</a>
       
     </p>
   </footer>
@@ -327,8 +295,8 @@ Instead building the custom chromaprint libs and then installing pyaudio via pip
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/';
-        var disqus_url = 'http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/';
+        var disqus_identifier = 'http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/';
+        var disqus_url = 'http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/';
         var disqus_script = 'embed.js';
       
     (function () {

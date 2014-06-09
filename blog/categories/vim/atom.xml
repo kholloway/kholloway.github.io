@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Vim | Systems and Automation]]></title>
   <link href="http://blog.fretzel.net/blog/categories/vim/atom.xml" rel="self"/>
   <link href="http://blog.fretzel.net/"/>
-  <updated>2014-06-08T20:03:10-05:00</updated>
+  <updated>2014-06-08T20:14:35-05:00</updated>
   <id>http://blog.fretzel.net/</id>
   <author>
     <name><![CDATA[Kent Holloway]]></name>
@@ -12,6 +12,37 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Vundle for Vim]]></title>
+    <link href="http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/"/>
+    <updated>2014-06-08T20:08:14-05:00</updated>
+    <id>http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim</id>
+    <content type="html"><![CDATA[<p>I have a new favorite Vim plugin manager called <a href="https://github.com/gmarik/Vundle.vim">Vundle</a>.</p>
+
+<p>It&rsquo;s simple and doesn&rsquo;t have all the overhead of some of the other Vim plugin managers/pref bundles.</p>
+
+<p>I&rsquo;m only using a small handful of plugins (shown below)</p>
+
+<p>```
+Bundle &lsquo;SuperTab&rsquo;</p>
+
+<p>&ldquo; Repos from GitHub
+Bundle &lsquo;bling/vim-airline&rsquo;
+Bundle &lsquo;tpope/vim-fugitive&rsquo;
+Bundle &lsquo;davidhalter/jedi-vim&rsquo;
+Bundle &lsquo;rodjek/vim-puppet&rsquo;
+Bundle &lsquo;elzr/vim-json&rsquo;</p>
+
+<p>&ldquo; installed bundles go here
+Bundle &lsquo;Syntastic&rsquo;
+```</p>
+
+<p>Vundle has been going through some upgrades lately which is making it even easier to use.</p>
+
+<p>Take 10 minutes and check it out.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Vim in All It's Awesomeness]]></title>
