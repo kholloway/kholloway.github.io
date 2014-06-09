@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: RHEL | Systems and Automation]]></title>
+  <link href="http://blog.fretzel.net/blog/categories/rhel/atom.xml" rel="self"/>
+  <link href="http://blog.fretzel.net/"/>
+  <updated>2014-06-08T19:50:08-05:00</updated>
+  <id>http://blog.fretzel.net/</id>
+  <author>
+    <name><![CDATA[Kent Holloway]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Gitorious/Redis Installer Updated]]></title>
+    <link href="http://blog.fretzel.net/blog/2013/03/26/gitorious-slash-redis-installer-updated/"/>
+    <updated>2013-03-26T16:40:00-05:00</updated>
+    <id>http://blog.fretzel.net/blog/2013/03/26/gitorious-slash-redis-installer-updated</id>
+    <content type="html"><![CDATA[<p>In regards to my last post <a href="/blog/2013/03/25/gitorious-and-the-redis-service/">gitorious-and-redis-service</a> I have updated my clone of the ce-installer to include the changes up to v2.4.12 and rolled all my changes from that post into the latest version.</p>
+
+<p>My CE-Installer clone:
+ <a href="https://www.gitorious.org/~kholloway/gitorious/kholloways-ce-installer">https://www.gitorious.org/~kholloway/gitorious/kholloways-ce-installer</a></p>
+
+<p>I have requested a merge with the mainline ce-installer which is viewable at:
+ <a href="https://www.gitorious.org/gitorious/ce-installer/merge_requests/2">https://www.gitorious.org/gitorious/ce-installer/merge_requests/2</a></p>
+
+<p>Enjoy!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Gitorious and the Redis Service]]></title>
+    <link href="http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/"/>
+    <updated>2013-03-25T15:03:09-05:00</updated>
+    <id>http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service</id>
+    <content type="html"><![CDATA[<p>Gitorious has a very nice status command via /usr/bin/gitorious_status that quickly shows you if all your Gitorious services are up and running (see screenshot).</p>
+
+<p><img class="left" src="/images/health_check.png" width="300" height="250"></p>
+
+<p>It&rsquo;s missing one very important service though, Redis!</p>
+
+<p>Redis is now the default messaging service when you do a fresh install via the <a href="http://getgitorious.com/installer">Gitorious CE-Installer</a> but it&rsquo;s not included in the status check, it&rsquo;s missing from the /admin/diagnostics page and it&rsquo;s missing a <a href="http://mmonit.com/monit/">Monit</a> check file to restart it if it dies. Keeping it running is pretty important for a working Gitorious install because without it many of the web page operations like creating a new project or team will fail and it won&rsquo;t be very clear from the logs why it failed.</p>
+
+<p>Lets fix some of those problems.</p>
+
+<p>First off lets patch the gitorious_status script with the patch below which should work on any modern Linux variant.</p>
+
+<p>Save the lines below as: <strong>/tmp/my.patch</strong></p>
+
+<p>```
+<strong><em> gitorious_status 2013-03-25 16:11:04.475121039 -0500
+&mdash;&ndash; gitorious_status_redis 2013-03-25 16:16:35.380135982 -0500
+</em></strong><strong><strong><strong><em>***** unicorn_status() {
+</em></strong> 26,31 </strong></strong>
+&mdash;&ndash; 26,35 &mdash;&mdash;</p>
+
+<pre><code>  check_process_and_report "ps -p $PID" "Unicorn"
+</code></pre>
+
+<p>  }</p>
+
+<ul>
+<li>redis_status() {</li>
+<li>  check_process_and_report &ldquo;/etc/init.d/redis status&rdquo; &ldquo;Redis&rdquo;</li>
+<li>}
++
+
+<h1>Upstart&rsquo;s exit codes are a beast of its own</h1>
+
+<p>resque_status() {
+    check_process_and_report &ldquo;/sbin/initctl status resque-worker&rdquo; &ldquo;Resque&rdquo;
+<strong><strong><strong><em>******** sphinx_status
+</em></strong> 80,82 </strong></strong>
+&mdash;&ndash; 84,87 &mdash;&mdash;
+memcached_status
+sshd_status
+mysqld_status</p></li>
+<li>redis_status</li>
+</ul>
+
+
+<p>```</p>
+
+<p>Apply your patch to the status command:</p>
+
+<pre><code> patch /usr/bin/gitorious_status &lt; /tmp/my.patch
+</code></pre>
+
+<p>Your status command should now show the details of the Redis service as shown below.</p>
+
+<p><img class="left" src="/images/redis-status.png" width="300" height="250"></p>
+
+<p>Next lets create a Monit config file for Redis which will watch the process and restart if needed.
+I use Puppet and a custom Monit module I wrote for this but it&rsquo;s not required.
+For now lets just manually create the file and you can integrate it into your configuration management tool later if you like. Note that the Monit file below is specific to Redhat, change the pidfile and start/stop lines as needed to match your OS.</p>
+
+<p>Copy the contents below into:
+   <strong>/etc/monit.d/redis.monit</strong></p>
+
+<p><code>
+check process redis-server with pidfile /var/run/redis/redis.pid
+  start program = "/sbin/service redis start"
+  stop program = "/sbin/service redis stop"
+  if does not exist for 1 cycles then restart
+  if 5 restarts within 5 cycles then alert
+</code></p>
+
+<p>Now lets restart Monit so it picks up the change.
+On Redhat that&rsquo;s done like so:</p>
+
+<pre><code>service monit restart
+</code></pre>
+
+<p>Check that it&rsquo;s setup correctly in Monit:</p>
+
+<pre><code>monit summary
+</code></pre>
+
+<p>OR</p>
+
+<pre><code>monit status
+</code></pre>
+
+<p>So now you have Redis monitored by Monit and the gitorious_status command shows you if it&rsquo;s up or down but your /admin/diagnostics page is still missing any status about it. That last bit is not too hard to fix but for now I&rsquo;m leaving that up to the Gitorious folks to patch along with the incorrect status about the gitorious-poller service which is not in use any longer.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Git CE Installer for RHEL 6.X]]></title>
+    <link href="http://blog.fretzel.net/blog/2013/03/04/git-ce-installer-for-rhel-6-dot-x/"/>
+    <updated>2013-03-04T07:36:51-06:00</updated>
+    <id>http://blog.fretzel.net/blog/2013/03/04/git-ce-installer-for-rhel-6-dot-x</id>
+    <content type="html"><![CDATA[<p>My small modifications to the main Gitorious CE installer so it installs cleanly on Redhat/RHEL 6.X instead of just on CentOS 6.X.
+It also does not try to update Puppet when it&rsquo;s already installed.</p>
+
+<p>I&rsquo;m maintaining a Git repo of my changes at Gitorious:
+ <a href="https://gitorious.org/~kholloway/gitorious/kholloways-ce-installer">Custom Gitorious CE Installer for RHEL</a></p>
+]]></content>
+  </entry>
+  
+</feed>

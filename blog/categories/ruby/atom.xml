@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ruby | Systems and Automation]]></title>
+  <link href="http://blog.fretzel.net/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://blog.fretzel.net/"/>
+  <updated>2014-06-08T19:50:08-05:00</updated>
+  <id>http://blog.fretzel.net/</id>
+  <author>
+    <name><![CDATA[Kent Holloway]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Multi-master Puppet Setup With DNS SRV Records]]></title>
+    <link href="http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/"/>
+    <updated>2014-02-21T21:00:00-06:00</updated>
+    <id>http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records</id>
+    <content type="html"><![CDATA[<p>I recently switched from a single Puppet master to a Multi-master setup which consists of a single CA server and 2 new masters.
+During this change I also took the time to upgrade my clients (and server) from 2.7.25 to 3.4.2 and Ruby from 1.8.7 to 2.0.0p353 oh and I also switched over to the new DNS SRV records setup.</p>
+
+<p>While I&rsquo;m not going to rehash the entire setup and all steps taken to get there I do want to include some high level steps that were not exactly clear after reading the Puppet labs docs on multi-master setups. Hopefully this helps others trying to accomplish the same thing.</p>
+
+<p>For my setup I used a standalone CA and 2 masters.  Follow the Puppet labs guides/docs to build out your CA and masters with whatever software you like. I used the blessed Apache + Passenger setup. For multi-masters there is no special setup required on the Apache/Passenger side of things, just set them up as usual with the exception of your config.ru file (see below).</p>
+
+<p>If you are upgrading from a single master 2.X setup you also need to remove any $servername references from your manifests. Most likely this will be in manifests/site.pp file.</p>
+
+<p>Don&rsquo;t just copy your config.ru from your old setup if you ran Puppet 3.x or older.
+Use the new config.ru.passenger.3 in the Puppet labs github repo. If you skip this step you will have a series of odd problems that you won&rsquo;t be able to resolve any other way. Make sure you chown the config.ru file as puppet:puppet since Passenger uses the owner of the file as the user to run as.</p>
+
+<p>Before you start your new CA or master servers you have to generate the SSL certs properly.
+On the CA: make sure your /etc/puppet/puppet.conf contains the lines below (adjust config as needed to support your setup):</p>
+
+<pre><code> [main]
+  pluginsource = puppet:///plugins
+  pluginsync = true
+  use_srv_records = true
+  srv_domain = mydomain.com
+
+ [master]
+  ca = true
+  dns_alt_names=myca1.mydomain.com,myca1
+  # Bits for Passenger/Apache
+  certname=puppetca.mydomain.com
+  ssl_client_header=SSL_CLIENT_S_DN
+  ssl_client_verify_header=SSL_CLIENT_VERIFY
+</code></pre>
+
+<p>Now run the command below on your CA to generate your CA certs with the proper dns_alt_names.
+Puppetca is an alias pointing at my hosts real name, DNS alt names should contain your hosts real name.</p>
+
+<pre><code>puppet cert generate puppetca.mydomain.com --dns_alt_names=myca1.mydomain.com,myca1
+</code></pre>
+
+<p>Verify that your cert looks correct with the command below, it should list your puppetca plus the alternate DNS names you specified.</p>
+
+<pre><code>puppet cert list puppetca.mydomain.com
+</code></pre>
+
+<p>Your CA is now ready to run, fire up the web server and double check your weblogs for any errors. Assuming all is good now you can switch over to one of your masters and make sure your config contains the bits below. The really important line is ca=false for any server that is not your CA server.</p>
+
+<pre><code>[main]
+   pluginsource = puppet:///plugins
+   pluginsync = true
+   use_srv_records = true
+   srv_domain = mydomain.com
+
+[master]
+   ca = false
+   # Bits for Passenger/Apache
+   certname=master1.mydomain.com
+   ssl_client_header=SSL_CLIENT_S_DN
+   ssl_client_verify_header=SSL_CLIENT_VERIFY
+</code></pre>
+
+<p>Run your master by hand the first time:</p>
+
+<pre><code>puppet master --no-daemonize --verbose
+</code></pre>
+
+<p>The master will generate it&rsquo;s cert and send it over to the CA server to get signed. If you are using autosigning just wait for the cert to be signed, if not go sign it on the CA server.</p>
+
+<p>Once that cert is signed you can hit CTRL-C and stop your master, now start it back up using the real web service. Once again check the weblogs for any errors. Try running the puppet agent by hand on this master now and see how it goes. You should get a clean run.</p>
+
+<p>Now head over to your 2nd or 3rd master and repeat the steps above for the masters.</p>
+
+<p>With your masters and your CA server working you can now tackle the clients.
+Using your existing puppet master (if you have one) add all the lines in the [main] section above to your clients. You can safely do this ahead of time because the 2.X clients don&rsquo;t support those features and will just ignore them.</p>
+
+<p>Now upgrade your packages via whatever tools you use to do package upgrades, for my setup I have a custom build of Ruby 2.0 packaged as an RPM using a fairly standard SPEC file.
+I then used the FPM utility to package up Puppet, Facter and all dependancies (don&rsquo;t forget about Augeas if you use it).</p>
+
+<p>Now on my hosts I can do a &lsquo;yum install ruby20-puppet&rsquo; and everything gets upgraded.
+Make sure your Puppet.conf file has those srv_domain bits above and then delete your clients &lsquo;ssl&rsquo; directory.
+Run the agent, it should automatically switch over to the new CA and masters and generate a cert, go sign it (or turn on autosigning), once signed the client should finish it&rsquo;s run as usual.</p>
+
+<p>One final note: Currently Puppet pluginsync is broken with 3.4.2 (and below) when using DNS SRV records. This should be fixed in a later version but the simple workaround for now is to remove the implied $servername portion in pluginsync and instead let it use the server that the client connected to by putting this line in each and EVERY puppet.conf file for both agents and masters in the [main] section.</p>
+
+<pre><code> [main]
+  pluginsource = puppet:///plugins
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

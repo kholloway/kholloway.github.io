@@ -9,8 +9,8 @@
   <meta name="author" content="Kent Holloway">
 
   
-  <meta name="description" content="I recently switched from a single Puppet master to a Multi-master setup which consists of a single CA server and 2 new masters.
-During this change I &hellip;">
+  <meta name="description" content="A short guide on how to do some basic audio fingerprinting on a Raspberry Pi also known as “my quest to notify myself when the dryer is done”.
+Lets &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -32,6 +32,18 @@ During this change I &hellip;">
 <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
   
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-51741075-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
 
 </head>
 
@@ -66,6 +78,103 @@ During this change I &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/">Audio Fingerprinting on Raspberry Pi (Part 1)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-05T17:15:43-06:00" pubdate data-updated="true">Mar 5<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A short guide on how to do some basic audio fingerprinting on a Raspberry Pi also known as “my quest to notify myself when the dryer is done”.
+Lets start with the excellent Chromaprint library.
+Build Chromaprint on Pi</p>
+
+<p>Install pre-reqs:</p>
+
+<pre><code>sudo apt-get install libboost1.50-all-dev ffmpeg libtag1-dev zlib1g-dev resample libresample1-dev cmake libffms2-dev  
+</code></pre>
+
+<p>Download package from Chromaprint source</p>
+
+<pre><code>mkdir /opt/src
+cd /opt/src
+wget https://bitbucket.org/acoustid/chromaprint/downloads/chromaprint-1.1.tar.gz
+tar -zxvf chromaprint-1.1.tar.gz
+cd chromaprint\*
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DCMAKE_CXX_FLAGS="-Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s" -DBUILD_TOOLS=ON
+make
+sudo make install
+</code></pre>
+
+<p>Python stuff</p>
+
+<p>If you don’t already have PIP installed go grab it:</p>
+
+<pre><code>sudo easy_install pip
+</code></pre>
+
+<p>Build/install Python packages now:</p>
+
+<pre><code>sudo pip install pyacoustid audioread
+</code></pre>
+
+<p>Create a test WAV file 10 seconds in length of whatever audio sound/noise/whatever that you want to fingerprint.
+In this case I’m using my USB microphone plugged into the Pi since there is no onboard microphone or audio input (and no analog inputs either).
+You can also use the PyAudio package you installed to record the wav file.</p>
+
+<pre><code>arecord -D plughw:1,0 -d 10 -r 44100 --channels=2 --format=cd /tmp/test.wav
+</code></pre>
+
+<p>Fingerprint your wave file (in python). Note: You can just as easily use ‘fpcalc’ in the shell to get a compressed or raw fingerprint from chromaprint libs.</p>
+
+<pre><code>import chromaprint
+import acoustid
+duration, fingerprint = acoustid.fingerprint_file('/tmp/test.wav')
+fp_raw = chromaprint.decode_fingerprint(fingerprint)[0]
+print "Compressed fingerprint: %s" % fingerprint
+print "Raw fingerprint: %s" % fp_raw
+</code></pre>
+
+<p>If all went well you should not have seen any errors and your compressed and raw fingerprint should have been printed to the screen.
+If you fingerprint only had “AQAA” in it then something is wrong with your chromaprint library.
+The available libchromaprint packages along with the python-pyaudio package did not work for me at all and consistently resulted in no fingerprints.
+Instead building the custom chromaprint libs and then installing pyaudio via pip resulted in a working setup.</p>
+
+<p>If you do have fingerprint errors make sure your wav file is not empty and if it’s not empty then try to do a clean build on the chromprint libs and re-install.</p>
+
+<p>Note: The example ‘fpcalc’ won’t actually build from the 1.1 chromaprint libs. It throws some strange compiler errors that I couldn’t resolve.</p>
+
+<p>I’m going to be recording 2 10 second files in a loop and that can be a bit hard on the SD card in the Raspberry Pi so instead I’m using the built in TMPFS location in /run so I don’t do a lot of unnecessary writes to the SD card.</p>
+
+<p>That’s all for now, come back for part 2 where I wrap it all up into a single script that records in a thread while analyzing the previous recording and sending notifications when matches are found.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -185,6 +294,477 @@ Run the agent, it should automatically switch over to the new CA and masters and
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/05/vim-in-all-its-awesomeness/">Vim in All It&#8217;s Awesomeness</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-05T07:36:29-06:00" pubdate data-updated="true">Dec 5<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I have tried many text editors (and various IDE&rsquo;s) over the years and I always come back to VIM for just about everything, especially anything programming related.
+Vim on it&rsquo;s own is great but with some plugins and some simple changes it&rsquo;s awesome.
+Everything from syntax highlighting (using Syntastic) to autocompletion of functions and variable names.
+Since I write a lot of code in Python and Puppet (Syntastic has checkers for both and much more) which has saved me an incredible amount of time since I started using it.</p>
+
+<p>Do yourself a favor and take 5 minutes to go get the incredible <a href="https://github.com/carlhuda/janus">Janus: Vim Distribution</a>.
+It&rsquo;s a quick and painless install.
+From the Janus README:</p>
+
+<pre><code>$ brew install macvim    (optional - requires [Homebrew](http://brew.sh/))
+$ curl -Lo- https://bit.ly/janus-bootstrap | bash
+</code></pre>
+
+<p>The above two commands are all you need, that second command will also backup your existing Vim files in your home directory so you don&rsquo;t lose anything you may already have setup.</p>
+
+<p>Customization is fairly simple using ~/.vimrc.before and ~/.vimrc.after files in your home dir.
+The only changes I make to the base Janus setup is shown below, put these changes in ~/.vimrc.after if you like.</p>
+
+<pre><code>" Clear searches easily with ,/ after
+nmap &lt;silent&gt; ,/ :nohlsearch&lt;CR&gt;
+
+" Give a shortcut key to NERD Tree
+map &lt;F2&gt; :NERDTreeToggle&lt;CR&gt;
+
+" Disable F1 help crap, map to ESC instead
+map &lt;F1&gt; &lt;Esc&gt;
+imap &lt;F1&gt; &lt;Esc&gt;
+</code></pre>
+
+<p>One of my favorite commands once you have Janus installed is to reformat an entire file with a simple keystroke:</p>
+
+<ul>
+<li>&lt;leader>fef formats the entire file</li>
+</ul>
+
+
+<p>The default &lt;leader> character is \ so \fef reformats your current file.
+Stop living in the dark ages, go install Janus right now!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/04/git-move-subdirectory-to-new-repo/">Git - Move Subdirectory to New Repo</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-04T15:08:22-05:00" pubdate data-updated="true">Apr 4<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I had a need to move/detach a subdirectory that was inside a larger Git repository into it&rsquo;s own smaller/standalone repository.
+After a few Google searches it turns out this is a fairly common and relatively easy thing to do.</p>
+
+<p>Not required but I like to start with a fresh clone of the repo I&rsquo;m working with into a temp directory.</p>
+
+<pre><code>mkdir tmp
+cd tmp
+git clone my_original_repo_url
+</code></pre>
+
+<p>Now clone the repo again (this time it&rsquo;s a local only clone of the repo above):</p>
+
+<pre><code>git clone --no-hardlinks my_original_repo new_repo_name
+cd new_repo_name
+</code></pre>
+
+<p>Extract just the subdirectory you want:</p>
+
+<pre><code>git filter-branch --subdirectory-filter mysubdir
+</code></pre>
+
+<p>Now lets remove the old remotes, any unneeded history and repack the repo:</p>
+
+<pre><code>git remote rm origin
+git update-ref -d refs/original/refs/heads/master
+git reflog expire --expire=now --all
+git repack -ad
+</code></pre>
+
+<p>Now you can add your new remote(s) in and push your changes up to the server:</p>
+
+<pre><code>git remote add origin my_new_repo_url
+git push origin master
+</code></pre>
+
+<p>Note: If you are using Gitorious it may at this point complain about a &lsquo;invalid ref&rsquo; when you push it to the server.
+As far as I can tell this does not cause any problems and only occurs on the first push.</p>
+
+<p>So that covers making your new repo from a subdirectory now lets go remove the now old subdirectory from the original repo so we don&rsquo;t commit to it by accident.
+I&rsquo;m using a simplified removal process, you could remove all references and commit info for the subdirectory if you like but for my case that was overkill.</p>
+
+<pre><code>cd ../my_original_repo
+rm -rf mysubdir
+git rm -r mysubdir
+git commit -m "Removing subdir, it has been moved to its own repo now"
+git push origin master
+</code></pre>
+
+<p>All done!
+Your subdirectory has now been moved from the original repository into a new repository with all your history and commits intact.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/26/gitorious-slash-redis-installer-updated/">Gitorious/Redis Installer Updated</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-26T16:40:00-05:00" pubdate data-updated="true">Mar 26<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In regards to my last post <a href="/blog/2013/03/25/gitorious-and-the-redis-service/">gitorious-and-redis-service</a> I have updated my clone of the ce-installer to include the changes up to v2.4.12 and rolled all my changes from that post into the latest version.</p>
+
+<p>My CE-Installer clone:
+ <a href="https://www.gitorious.org/~kholloway/gitorious/kholloways-ce-installer">https://www.gitorious.org/~kholloway/gitorious/kholloways-ce-installer</a></p>
+
+<p>I have requested a merge with the mainline ce-installer which is viewable at:
+ <a href="https://www.gitorious.org/gitorious/ce-installer/merge_requests/2">https://www.gitorious.org/gitorious/ce-installer/merge_requests/2</a></p>
+
+<p>Enjoy!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/25/gitorious-and-the-redis-service/">Gitorious and the Redis Service</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-25T15:03:09-05:00" pubdate data-updated="true">Mar 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Gitorious has a very nice status command via /usr/bin/gitorious_status that quickly shows you if all your Gitorious services are up and running (see screenshot).</p>
+
+<p><img class="left" src="/images/health_check.png" width="300" height="250"></p>
+
+<p>It&rsquo;s missing one very important service though, Redis!</p>
+
+<p>Redis is now the default messaging service when you do a fresh install via the <a href="http://getgitorious.com/installer">Gitorious CE-Installer</a> but it&rsquo;s not included in the status check, it&rsquo;s missing from the /admin/diagnostics page and it&rsquo;s missing a <a href="http://mmonit.com/monit/">Monit</a> check file to restart it if it dies. Keeping it running is pretty important for a working Gitorious install because without it many of the web page operations like creating a new project or team will fail and it won&rsquo;t be very clear from the logs why it failed.</p>
+
+<p>Lets fix some of those problems.</p>
+
+<p>First off lets patch the gitorious_status script with the patch below which should work on any modern Linux variant.</p>
+
+<p>Save the lines below as: <strong>/tmp/my.patch</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>*** gitorious_status 2013-03-25 16:11:04.475121039 -0500
+</span><span class='line'>--- gitorious_status_redis 2013-03-25 16:16:35.380135982 -0500
+</span><span class='line'>*************** unicorn_status() {
+</span><span class='line'>*** 26,31 ****
+</span><span class='line'>--- 26,35 ----
+</span><span class='line'>      check_process_and_report "ps -p $PID" "Unicorn"
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>+ redis_status() {
+</span><span class='line'>+     check_process_and_report "/etc/init.d/redis status" "Redis"
+</span><span class='line'>+ }
+</span><span class='line'>+
+</span><span class='line'>  # Upstart's exit codes are a beast of its own
+</span><span class='line'>  resque_status() {
+</span><span class='line'>      check_process_and_report "/sbin/initctl status resque-worker" "Resque"
+</span><span class='line'>*************** sphinx_status
+</span><span class='line'>*** 80,82 ****
+</span><span class='line'>--- 84,87 ----
+</span><span class='line'>  memcached_status
+</span><span class='line'>  sshd_status
+</span><span class='line'>  mysqld_status
+</span><span class='line'>+ redis_status
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Apply your patch to the status command:</p>
+
+<pre><code> patch /usr/bin/gitorious_status &lt; /tmp/my.patch
+</code></pre>
+
+<p>Your status command should now show the details of the Redis service as shown below.</p>
+
+<p><img class="left" src="/images/redis-status.png" width="300" height="250"></p>
+
+<p>Next lets create a Monit config file for Redis which will watch the process and restart if needed.
+I use Puppet and a custom Monit module I wrote for this but it&rsquo;s not required.
+For now lets just manually create the file and you can integrate it into your configuration management tool later if you like. Note that the Monit file below is specific to Redhat, change the pidfile and start/stop lines as needed to match your OS.</p>
+
+<p>Copy the contents below into:
+   <strong>/etc/monit.d/redis.monit</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>check process redis-server with pidfile /var/run/redis/redis.pid
+</span><span class='line'>  start program = "/sbin/service redis start"
+</span><span class='line'>  stop program = "/sbin/service redis stop"
+</span><span class='line'>  if does not exist for 1 cycles then restart
+</span><span class='line'>  if 5 restarts within 5 cycles then alert</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now lets restart Monit so it picks up the change.
+On Redhat that&rsquo;s done like so:</p>
+
+<pre><code>service monit restart
+</code></pre>
+
+<p>Check that it&rsquo;s setup correctly in Monit:</p>
+
+<pre><code>monit summary
+</code></pre>
+
+<p>OR</p>
+
+<pre><code>monit status
+</code></pre>
+
+<p>So now you have Redis monitored by Monit and the gitorious_status command shows you if it&rsquo;s up or down but your /admin/diagnostics page is still missing any status about it. That last bit is not too hard to fix but for now I&rsquo;m leaving that up to the Gitorious folks to patch along with the incorrect status about the gitorious-poller service which is not in use any longer.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader/">My New RSS Setup After the Death of Google Reader</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-16T10:25:00-05:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>My setup for now, so far working very well.</p>
+
+<p><a href="http://www.feedafever.com/">FeedaFever</a> on my server (I love owning my own data!)
+Reeder iOS app on the iPhone and I&rsquo;m hoping the Reeder dev adds FeedaFever support for Reeder on iPad and Mac soon.</p>
+
+<p>Fever has a usable web interface on both iPad and iPhone if you don&rsquo;t have a native app but Reeder is the gold standard on iOS for an RSS reader.</p>
+
+<p>Alternative iPhone app choice for FeedaFever: <a href="https://itunes.apple.com/us/app/sunstroke/id488564806?mt=8">Sunstroke</a></p>
+
+<p>Some alternatives I looked at and still might use down the road are <a href="http://www.newsblur.com/">NewsBlur</a> and <a href="http://www.feedly.com/">Feedly</a>.
+NewsBlur is hosted with free accounts or premium accounts and if you want it&rsquo;s open source so you can download and run your own server.</p>
+
+<p>Feedly looks nice also but I&rsquo;m not used to the layout/setup yet.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/04/git-ce-installer-for-rhel-6-dot-x/">Git CE Installer for RHEL 6.X</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-04T07:36:51-06:00" pubdate data-updated="true">Mar 4<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>My small modifications to the main Gitorious CE installer so it installs cleanly on Redhat/RHEL 6.X instead of just on CentOS 6.X.
+It also does not try to update Puppet when it&rsquo;s already installed.</p>
+
+<p>I&rsquo;m maintaining a Git repo of my changes at Gitorious:
+ <a href="https://gitorious.org/~kholloway/gitorious/kholloways-ce-installer">Custom Gitorious CE Installer for RHEL</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/04/svn-to-git/">SVN to Git</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-04T07:23:58-06:00" pubdate data-updated="true">Mar 4<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>SVN &ndash;> Git:</p>
+
+<p> Good post by Makis about how to setup SVN to Git conversions.</p>
+
+<p><a href="http://blog.sofistes.net/2010/07/transferring-svn-repository-to.html">Transferring-svn-repository-to-git</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
     <a href="/blog/archives">Blog Archives</a>
@@ -198,12 +778,75 @@ Run the agent, it should automatically switch over to the new CA and masters and
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/">Audio Fingerprinting on Raspberry Pi (Part 1)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/">Multi-master Puppet Setup With DNS SRV Records</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/05/vim-in-all-its-awesomeness/">Vim in All It&#8217;s Awesomeness</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/04/git-move-subdirectory-to-new-repo/">Git - Move Subdirectory to New Repo</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/26/gitorious-slash-redis-installer-updated/">Gitorious/Redis Installer Updated</a>
       </li>
     
   </ul>
 </section>
 
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/kholloway">@kholloway</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kholloway',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll&#8230;</ul>
+  <p><a href="http://pinboard.in/u:sanity">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "sanity"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
 
 
 
@@ -220,6 +863,19 @@ Run the agent, it should automatically switch over to the new CA and masters and
 
 </footer>
   
+
+<script type="text/javascript">
+      var disqus_shortname = 'sysat';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 

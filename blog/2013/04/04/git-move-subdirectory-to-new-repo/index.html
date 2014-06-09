@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blog Archive - Systems and Automation</title>
+  <title>Git - Move Subdirectory to New Repo - Systems and Automation</title>
   <meta name="author" content="Kent Holloway">
 
   
-  <meta name="description" content="Blog Archive 2014 Audio Fingerprinting on Raspberry Pi (Part 1)
-Mar 05 2014 posted in Audio, Python, Raspberry Pi Multi-master Puppet Setup With DNS &hellip;">
+  <meta name="description" content="I had a need to move/detach a subdirectory that was inside a larger Git repository into it&rsquo;s own smaller/standalone repository.
+After a few &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ Mar 05 2014 posted in Audio, Python, Raspberry Pi Multi-master Puppet Setup With
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.fretzel.net/blog/archives">
+  <link rel="canonical" href="http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Systems and Automation" type="application/atom+xml">
@@ -77,151 +77,142 @@ Mar 05 2014 posted in Audio, Python, Raspberry Pi Multi-master Puppet Setup With
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Blog Archive</h1>
+    
+      <h1 class="entry-title">Git - Move Subdirectory to New Repo</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-04T15:08:22-05:00" pubdate data-updated="true">Apr 4<span>th</span>, 2013</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives">
 
 
+<div class="entry-content"><p>I had a need to move/detach a subdirectory that was inside a larger Git repository into it&rsquo;s own smaller/standalone repository.
+After a few Google searches it turns out this is a fairly common and relatively easy thing to do.</p>
 
-  
-  <h2>2014</h2>
+<p>Not required but I like to start with a fresh clone of the repo I&rsquo;m working with into a temp directory.</p>
 
-<article>
-  
-<h1><a href="/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/">Audio Fingerprinting on Raspberry Pi (Part 1)</a></h1>
-<time datetime="2014-03-05T17:15:43-06:00" pubdate><span class='month'>Mar</span> <span class='day'>05</span> <span class='year'>2014</span></time>
+<pre><code>mkdir tmp
+cd tmp
+git clone my_original_repo_url
+</code></pre>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/audio/'>Audio</a>, <a class='category' href='/blog/categories/python/'>Python</a>, <a class='category' href='/blog/categories/raspberry-pi/'>Raspberry Pi</a></span>
-</footer>
+<p>Now clone the repo again (this time it&rsquo;s a local only clone of the repo above):</p>
 
+<pre><code>git clone --no-hardlinks my_original_repo new_repo_name
+cd new_repo_name
+</code></pre>
 
-</article>
+<p>Extract just the subdirectory you want:</p>
 
+<pre><code>git filter-branch --subdirectory-filter mysubdir
+</code></pre>
 
+<p>Now lets remove the old remotes, any unneeded history and repack the repo:</p>
 
-<article>
-  
-<h1><a href="/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/">Multi-master Puppet Setup With DNS SRV Records</a></h1>
-<time datetime="2014-02-21T21:00:00-06:00" pubdate><span class='month'>Feb</span> <span class='day'>21</span> <span class='year'>2014</span></time>
+<pre><code>git remote rm origin
+git update-ref -d refs/original/refs/heads/master
+git reflog expire --expire=now --all
+git repack -ad
+</code></pre>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/puppet/'>Puppet</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
+<p>Now you can add your new remote(s) in and push your changes up to the server:</p>
 
+<pre><code>git remote add origin my_new_repo_url
+git push origin master
+</code></pre>
 
-</article>
+<p>Note: If you are using Gitorious it may at this point complain about a &lsquo;invalid ref&rsquo; when you push it to the server.
+As far as I can tell this does not cause any problems and only occurs on the first push.</p>
 
+<p>So that covers making your new repo from a subdirectory now lets go remove the now old subdirectory from the original repo so we don&rsquo;t commit to it by accident.
+I&rsquo;m using a simplified removal process, you could remove all references and commit info for the subdirectory if you like but for my case that was overkill.</p>
 
+<pre><code>cd ../my_original_repo
+rm -rf mysubdir
+git rm -r mysubdir
+git commit -m "Removing subdir, it has been moved to its own repo now"
+git push origin master
+</code></pre>
 
-  
-  <h2>2013</h2>
-
-<article>
-  
-<h1><a href="/blog/2013/12/05/vim-in-all-its-awesomeness/">Vim in All It&#8217;s Awesomeness</a></h1>
-<time datetime="2013-12-05T07:36:29-06:00" pubdate><span class='month'>Dec</span> <span class='day'>05</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/janus/'>Janus</a>, <a class='category' href='/blog/categories/vim/'>Vim</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/04/04/git-move-subdirectory-to-new-repo/">Git - Move Subdirectory to New Repo</a></h1>
-<time datetime="2013-04-04T15:08:22-05:00" pubdate><span class='month'>Apr</span> <span class='day'>04</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>Git</a>, <a class='category' href='/blog/categories/gitorious/'>Gitorious</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/03/26/gitorious-slash-redis-installer-updated/">Gitorious/Redis Installer Updated</a></h1>
-<time datetime="2013-03-26T16:40:00-05:00" pubdate><span class='month'>Mar</span> <span class='day'>26</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>Git</a>, <a class='category' href='/blog/categories/gitorious/'>Gitorious</a>, <a class='category' href='/blog/categories/rhel/'>RHEL</a>, <a class='category' href='/blog/categories/redhat/'>Redhat</a>, <a class='category' href='/blog/categories/redis/'>Redis</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/03/25/gitorious-and-the-redis-service/">Gitorious and the Redis Service</a></h1>
-<time datetime="2013-03-25T15:03:09-05:00" pubdate><span class='month'>Mar</span> <span class='day'>25</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>Git</a>, <a class='category' href='/blog/categories/gitorious/'>Gitorious</a>, <a class='category' href='/blog/categories/rhel/'>RHEL</a>, <a class='category' href='/blog/categories/redhat/'>Redhat</a>, <a class='category' href='/blog/categories/redis/'>Redis</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader/">My New RSS Setup After the Death of Google Reader</a></h1>
-<time datetime="2013-03-16T10:25:00-05:00" pubdate><span class='month'>Mar</span> <span class='day'>16</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/fever/'>Fever</a>, <a class='category' href='/blog/categories/google-reader/'>Google Reader</a>, <a class='category' href='/blog/categories/rss/'>RSS</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/03/04/git-ce-installer-for-rhel-6-dot-x/">Git CE Installer for RHEL 6.X</a></h1>
-<time datetime="2013-03-04T07:36:51-06:00" pubdate><span class='month'>Mar</span> <span class='day'>04</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>Git</a>, <a class='category' href='/blog/categories/gitorious/'>Gitorious</a>, <a class='category' href='/blog/categories/rhel/'>RHEL</a>, <a class='category' href='/blog/categories/redhat/'>Redhat</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2013/03/04/svn-to-git/">SVN to Git</a></h1>
-<time datetime="2013-03-04T07:23:58-06:00" pubdate><span class='month'>Mar</span> <span class='day'>04</span> <span class='year'>2013</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>Git</a>, <a class='category' href='/blog/categories/svn/'>SVN</a>, <a class='category' href='/blog/categories/subversion/'>Subversion</a></span>
-</footer>
-
-
-</article>
-
+<p>All done!
+Your subdirectory has now been moved from the original repository into a new repository with all your history and commits intact.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Kent Holloway</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-04T15:08:22-05:00" pubdate data-updated="true">Apr 4<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/git/'>Git</a>, <a class='category' href='/blog/categories/gitorious/'>Gitorious</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo/" data-via="" data-counturl="http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/03/26/gitorious-slash-redis-installer-updated/" title="Previous Post: Gitorious/Redis installer updated">&laquo; Gitorious/Redis installer updated</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/12/05/vim-in-all-its-awesomeness/" title="Next Post: Vim in all it's awesomeness">Vim in all it's awesomeness &raquo;</a>
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -323,7 +314,10 @@ Mar 05 2014 posted in Audio, Python, Raspberry Pi Multi-master Puppet Setup With
       var disqus_shortname = 'sysat';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo/';
+        var disqus_url = 'http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

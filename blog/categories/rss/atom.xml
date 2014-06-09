@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: RSS | Systems and Automation]]></title>
+  <link href="http://blog.fretzel.net/blog/categories/rss/atom.xml" rel="self"/>
+  <link href="http://blog.fretzel.net/"/>
+  <updated>2014-06-08T19:50:08-05:00</updated>
+  <id>http://blog.fretzel.net/</id>
+  <author>
+    <name><![CDATA[Kent Holloway]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[My New RSS Setup After the Death of Google Reader]]></title>
+    <link href="http://blog.fretzel.net/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader/"/>
+    <updated>2013-03-16T10:25:00-05:00</updated>
+    <id>http://blog.fretzel.net/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader</id>
+    <content type="html"><![CDATA[<p>My setup for now, so far working very well.</p>
+
+<p><a href="http://www.feedafever.com/">FeedaFever</a> on my server (I love owning my own data!)
+Reeder iOS app on the iPhone and I&rsquo;m hoping the Reeder dev adds FeedaFever support for Reeder on iPad and Mac soon.</p>
+
+<p>Fever has a usable web interface on both iPad and iPhone if you don&rsquo;t have a native app but Reeder is the gold standard on iOS for an RSS reader.</p>
+
+<p>Alternative iPhone app choice for FeedaFever: <a href="https://itunes.apple.com/us/app/sunstroke/id488564806?mt=8">Sunstroke</a></p>
+
+<p>Some alternatives I looked at and still might use down the road are <a href="http://www.newsblur.com/">NewsBlur</a> and <a href="http://www.feedly.com/">Feedly</a>.
+NewsBlur is hosted with free accounts or premium accounts and if you want it&rsquo;s open source so you can download and run your own server.</p>
+
+<p>Feedly looks nice also but I&rsquo;m not used to the layout/setup yet.</p>
+]]></content>
+  </entry>
+  
+</feed>

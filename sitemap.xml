@@ -1,18 +1,56 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+        <loc>http://blog.fretzel.net/blog/2013/03/04/svn-to-git/</loc>
+        <lastmod>2014-06-08T19:34:54-05:00</lastmod>
+    </url>
+    <url>
+        <loc>http://blog.fretzel.net/blog/2013/03/04/git-ce-installer-for-rhel-6-dot-x/</loc>
+        <lastmod>2014-06-08T19:34:49-05:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://blog.fretzel.net/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader/
+        </loc>
+        <lastmod>2014-06-08T19:34:59-05:00</lastmod>
+    </url>
+    <url>
+        <loc>http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/</loc>
+        <lastmod>2014-06-08T19:35:06-05:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://blog.fretzel.net/blog/2013/03/26/gitorious-slash-redis-installer-updated/
+        </loc>
+        <lastmod>2014-06-08T19:17:40-05:00</lastmod>
+    </url>
+    <url>
+        <loc>http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo/</loc>
+        <lastmod>2014-06-08T19:42:03-05:00</lastmod>
+    </url>
+    <url>
+        <loc>http://blog.fretzel.net/blog/2013/12/05/vim-in-all-its-awesomeness/</loc>
+        <lastmod>2014-06-08T19:45:54-05:00</lastmod>
+    </url>
+    <url>
         <loc>
             http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/
         </loc>
-        <lastmod>2014-06-08T00:02:28-05:00</lastmod>
+        <lastmod>2014-06-08T19:35:30-05:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/
+        </loc>
+        <lastmod>2014-06-08T19:49:59-05:00</lastmod>
     </url>
     <url>
         <loc>http://blog.fretzel.net/blog/archives/</loc>
-        <lastmod>2014-06-08T00:02:28-05:00</lastmod>
+        <lastmod>2014-06-08T19:49:59-05:00</lastmod>
     </url>
     <url>
         <loc>http://blog.fretzel.net/</loc>
-        <lastmod>2014-06-08T00:02:28-05:00</lastmod>
+        <lastmod>2014-06-08T19:49:59-05:00</lastmod>
     </url>
     <url>
         <loc>http://blog.fretzel.net/robots.txt</loc>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Janus | Systems and Automation]]></title>
+  <link href="http://blog.fretzel.net/blog/categories/janus/atom.xml" rel="self"/>
+  <link href="http://blog.fretzel.net/"/>
+  <updated>2014-06-08T19:50:08-05:00</updated>
+  <id>http://blog.fretzel.net/</id>
+  <author>
+    <name><![CDATA[Kent Holloway]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Vim in All It's Awesomeness]]></title>
+    <link href="http://blog.fretzel.net/blog/2013/12/05/vim-in-all-its-awesomeness/"/>
+    <updated>2013-12-05T07:36:29-06:00</updated>
+    <id>http://blog.fretzel.net/blog/2013/12/05/vim-in-all-its-awesomeness</id>
+    <content type="html"><![CDATA[<p>I have tried many text editors (and various IDE&rsquo;s) over the years and I always come back to VIM for just about everything, especially anything programming related.
+Vim on it&rsquo;s own is great but with some plugins and some simple changes it&rsquo;s awesome.
+Everything from syntax highlighting (using Syntastic) to autocompletion of functions and variable names.
+Since I write a lot of code in Python and Puppet (Syntastic has checkers for both and much more) which has saved me an incredible amount of time since I started using it.</p>
+
+<p>Do yourself a favor and take 5 minutes to go get the incredible <a href="https://github.com/carlhuda/janus">Janus: Vim Distribution</a>.
+It&rsquo;s a quick and painless install.
+From the Janus README:</p>
+
+<pre><code>$ brew install macvim    (optional - requires [Homebrew](http://brew.sh/))
+$ curl -Lo- https://bit.ly/janus-bootstrap | bash
+</code></pre>
+
+<p>The above two commands are all you need, that second command will also backup your existing Vim files in your home directory so you don&rsquo;t lose anything you may already have setup.</p>
+
+<p>Customization is fairly simple using ~/.vimrc.before and ~/.vimrc.after files in your home dir.
+The only changes I make to the base Janus setup is shown below, put these changes in ~/.vimrc.after if you like.</p>
+
+<pre><code>" Clear searches easily with ,/ after
+nmap &lt;silent&gt; ,/ :nohlsearch&lt;CR&gt;
+
+" Give a shortcut key to NERD Tree
+map &lt;F2&gt; :NERDTreeToggle&lt;CR&gt;
+
+" Disable F1 help crap, map to ESC instead
+map &lt;F1&gt; &lt;Esc&gt;
+imap &lt;F1&gt; &lt;Esc&gt;
+</code></pre>
+
+<p>One of my favorite commands once you have Janus installed is to reformat an entire file with a simple keystroke:</p>
+
+<ul>
+<li>&lt;leader>fef formats the entire file</li>
+</ul>
+
+
+<p>The default &lt;leader> character is \ so \fef reformats your current file.
+Stop living in the dark ages, go install Janus right now!</p>
+]]></content>
+  </entry>
+  
+</feed>

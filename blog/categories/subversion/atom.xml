@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Subversion | Systems and Automation]]></title>
+  <link href="http://blog.fretzel.net/blog/categories/subversion/atom.xml" rel="self"/>
+  <link href="http://blog.fretzel.net/"/>
+  <updated>2014-06-08T19:50:08-05:00</updated>
+  <id>http://blog.fretzel.net/</id>
+  <author>
+    <name><![CDATA[Kent Holloway]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[SVN to Git]]></title>
+    <link href="http://blog.fretzel.net/blog/2013/03/04/svn-to-git/"/>
+    <updated>2013-03-04T07:23:58-06:00</updated>
+    <id>http://blog.fretzel.net/blog/2013/03/04/svn-to-git</id>
+    <content type="html"><![CDATA[<p>SVN &ndash;> Git:</p>
+
+<p> Good post by Makis about how to setup SVN to Git conversions.</p>
+
+<p><a href="http://blog.sofistes.net/2010/07/transferring-svn-repository-to.html">Transferring-svn-repository-to-git</a></p>
+]]></content>
+  </entry>
+  
+</feed>

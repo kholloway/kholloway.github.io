@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Gitorious and the Redis Service - Systems and Automation</title>
+  <meta name="author" content="Kent Holloway">
+
+  
+  <meta name="description" content="Gitorious has a very nice status command via /usr/bin/gitorious_status that quickly shows you if all your Gitorious services are up and running (see &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Systems and Automation" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-51741075-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Systems and Automation</a></h1>
+  
+    <h2>stuff I like</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.fretzel.net" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Gitorious and the Redis Service</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-25T15:03:09-05:00" pubdate data-updated="true">Mar 25<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Gitorious has a very nice status command via /usr/bin/gitorious_status that quickly shows you if all your Gitorious services are up and running (see screenshot).</p>
+
+<p><img class="left" src="/images/health_check.png" width="300" height="250"></p>
+
+<p>It&rsquo;s missing one very important service though, Redis!</p>
+
+<p>Redis is now the default messaging service when you do a fresh install via the <a href="http://getgitorious.com/installer">Gitorious CE-Installer</a> but it&rsquo;s not included in the status check, it&rsquo;s missing from the /admin/diagnostics page and it&rsquo;s missing a <a href="http://mmonit.com/monit/">Monit</a> check file to restart it if it dies. Keeping it running is pretty important for a working Gitorious install because without it many of the web page operations like creating a new project or team will fail and it won&rsquo;t be very clear from the logs why it failed.</p>
+
+<p>Lets fix some of those problems.</p>
+
+<p>First off lets patch the gitorious_status script with the patch below which should work on any modern Linux variant.</p>
+
+<p>Save the lines below as: <strong>/tmp/my.patch</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>*** gitorious_status 2013-03-25 16:11:04.475121039 -0500
+</span><span class='line'>--- gitorious_status_redis 2013-03-25 16:16:35.380135982 -0500
+</span><span class='line'>*************** unicorn_status() {
+</span><span class='line'>*** 26,31 ****
+</span><span class='line'>--- 26,35 ----
+</span><span class='line'>      check_process_and_report "ps -p $PID" "Unicorn"
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>+ redis_status() {
+</span><span class='line'>+     check_process_and_report "/etc/init.d/redis status" "Redis"
+</span><span class='line'>+ }
+</span><span class='line'>+
+</span><span class='line'>  # Upstart's exit codes are a beast of its own
+</span><span class='line'>  resque_status() {
+</span><span class='line'>      check_process_and_report "/sbin/initctl status resque-worker" "Resque"
+</span><span class='line'>*************** sphinx_status
+</span><span class='line'>*** 80,82 ****
+</span><span class='line'>--- 84,87 ----
+</span><span class='line'>  memcached_status
+</span><span class='line'>  sshd_status
+</span><span class='line'>  mysqld_status
+</span><span class='line'>+ redis_status
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Apply your patch to the status command:</p>
+
+<pre><code> patch /usr/bin/gitorious_status &lt; /tmp/my.patch
+</code></pre>
+
+<p>Your status command should now show the details of the Redis service as shown below.</p>
+
+<p><img class="left" src="/images/redis-status.png" width="300" height="250"></p>
+
+<p>Next lets create a Monit config file for Redis which will watch the process and restart if needed.
+I use Puppet and a custom Monit module I wrote for this but it&rsquo;s not required.
+For now lets just manually create the file and you can integrate it into your configuration management tool later if you like. Note that the Monit file below is specific to Redhat, change the pidfile and start/stop lines as needed to match your OS.</p>
+
+<p>Copy the contents below into:
+   <strong>/etc/monit.d/redis.monit</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>check process redis-server with pidfile /var/run/redis/redis.pid
+</span><span class='line'>  start program = "/sbin/service redis start"
+</span><span class='line'>  stop program = "/sbin/service redis stop"
+</span><span class='line'>  if does not exist for 1 cycles then restart
+</span><span class='line'>  if 5 restarts within 5 cycles then alert</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now lets restart Monit so it picks up the change.
+On Redhat that&rsquo;s done like so:</p>
+
+<pre><code>service monit restart
+</code></pre>
+
+<p>Check that it&rsquo;s setup correctly in Monit:</p>
+
+<pre><code>monit summary
+</code></pre>
+
+<p>OR</p>
+
+<pre><code>monit status
+</code></pre>
+
+<p>So now you have Redis monitored by Monit and the gitorious_status command shows you if it&rsquo;s up or down but your /admin/diagnostics page is still missing any status about it. That last bit is not too hard to fix but for now I&rsquo;m leaving that up to the Gitorious folks to patch along with the incorrect status about the gitorious-poller service which is not in use any longer.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Kent Holloway</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-25T15:03:09-05:00" pubdate data-updated="true">Mar 25<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/git/'>Git</a>, <a class='category' href='/blog/categories/gitorious/'>Gitorious</a>, <a class='category' href='/blog/categories/rhel/'>RHEL</a>, <a class='category' href='/blog/categories/redhat/'>Redhat</a>, <a class='category' href='/blog/categories/redis/'>Redis</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/" data-via="" data-counturl="http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader/" title="Previous Post: My new RSS setup after the death of Google Reader">&laquo; My new RSS setup after the death of Google Reader</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/03/26/gitorious-slash-redis-installer-updated/" title="Next Post: Gitorious/Redis installer updated">Gitorious/Redis installer updated &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/">Audio Fingerprinting on Raspberry Pi (Part 1)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/">Multi-master Puppet Setup With DNS SRV Records</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/05/vim-in-all-its-awesomeness/">Vim in All It's Awesomeness</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/04/git-move-subdirectory-to-new-repo/">Git - Move Subdirectory to New Repo</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/26/gitorious-slash-redis-installer-updated/">Gitorious/Redis Installer Updated</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/kholloway">@kholloway</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kholloway',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:sanity">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "sanity"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Kent Holloway -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sysat';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/';
+        var disqus_url = 'http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
