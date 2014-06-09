@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Blog | Systems and Automation]]></title>
+  <link href="http://blog.fretzel.net/blog/categories/blog/atom.xml" rel="self"/>
+  <link href="http://blog.fretzel.net/"/>
+  <updated>2014-06-08T20:03:10-05:00</updated>
+  <id>http://blog.fretzel.net/</id>
+  <author>
+    <name><![CDATA[Kent Holloway]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[New Blog Home and Software]]></title>
+    <link href="http://blog.fretzel.net/blog/2014/06/08/new-blog-home-and-software/"/>
+    <updated>2014-06-08T19:56:51-05:00</updated>
+    <id>http://blog.fretzel.net/blog/2014/06/08/new-blog-home-and-software</id>
+    <content type="html"><![CDATA[<p>Welcome to the new home for my little blog.
+I&rsquo;m using <a href="http://octopress.org">Octopress</a> and really liking it so far.</p>
+]]></content>
+  </entry>
+  
+</feed>
