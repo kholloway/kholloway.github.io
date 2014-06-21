@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Redhat | Systems and Automation]]></title>
   <link href="http://blog.fretzel.net/blog/categories/redhat/atom.xml" rel="self"/>
   <link href="http://blog.fretzel.net/"/>
-  <updated>2014-06-08T20:14:35-05:00</updated>
+  <updated>2014-06-21T17:48:27-05:00</updated>
   <id>http://blog.fretzel.net/</id>
   <author>
     <name><![CDATA[Kent Holloway]]></name>
@@ -49,39 +49,29 @@
 
 <p>Save the lines below as: <strong>/tmp/my.patch</strong></p>
 
-<p>```
-<strong><em> gitorious_status 2013-03-25 16:11:04.475121039 -0500
-&mdash;&ndash; gitorious_status_redis 2013-03-25 16:16:35.380135982 -0500
-</em></strong><strong><strong><strong><em>***** unicorn_status() {
-</em></strong> 26,31 </strong></strong>
-&mdash;&ndash; 26,35 &mdash;&mdash;</p>
+<pre><code>*** gitorious_status 2013-03-25 16:11:04.475121039 -0500
+--- gitorious_status_redis 2013-03-25 16:16:35.380135982 -0500
+*************** unicorn_status() {
+*** 26,31 ****
+--- 26,35 ----
+      check_process_and_report "ps -p $PID" "Unicorn"
+  }
 
-<pre><code>  check_process_and_report "ps -p $PID" "Unicorn"
-</code></pre>
-
-<p>  }</p>
-
-<ul>
-<li>redis_status() {</li>
-<li>  check_process_and_report &ldquo;/etc/init.d/redis status&rdquo; &ldquo;Redis&rdquo;</li>
-<li>}
++ redis_status() {
++     check_process_and_report "/etc/init.d/redis status" "Redis"
++ }
 +
-
-<h1>Upstart&rsquo;s exit codes are a beast of its own</h1>
-
-<p>resque_status() {
-    check_process_and_report &ldquo;/sbin/initctl status resque-worker&rdquo; &ldquo;Resque&rdquo;
-<strong><strong><strong><em>******** sphinx_status
-</em></strong> 80,82 </strong></strong>
-&mdash;&ndash; 84,87 &mdash;&mdash;
-memcached_status
-sshd_status
-mysqld_status</p></li>
-<li>redis_status</li>
-</ul>
-
-
-<p>```</p>
+  # Upstart's exit codes are a beast of its own
+  resque_status() {
+      check_process_and_report "/sbin/initctl status resque-worker" "Resque"
+*************** sphinx_status
+*** 80,82 ****
+--- 84,87 ----
+  memcached_status
+  sshd_status
+  mysqld_status
++ redis_status
+</code></pre>
 
 <p>Apply your patch to the status command:</p>
 
@@ -99,13 +89,12 @@ For now lets just manually create the file and you can integrate it into your co
 <p>Copy the contents below into:
    <strong>/etc/monit.d/redis.monit</strong></p>
 
-<p><code>
-check process redis-server with pidfile /var/run/redis/redis.pid
+<pre><code>check process redis-server with pidfile /var/run/redis/redis.pid
   start program = "/sbin/service redis start"
   stop program = "/sbin/service redis stop"
   if does not exist for 1 cycles then restart
   if 5 restarts within 5 cycles then alert
-</code></p>
+</code></pre>
 
 <p>Now lets restart Monit so it picks up the change.
 On Redhat that&rsquo;s done like so:</p>

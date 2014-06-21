@@ -1,67 +1,87 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
-    <url>
-        <loc>http://blog.fretzel.net/blog/2013/03/04/svn-to-git/</loc>
-        <lastmod>2014-06-08T19:34:54-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/blog/2013/03/04/git-ce-installer-for-rhel-6-dot-x/</loc>
-        <lastmod>2014-06-08T19:34:49-05:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://blog.fretzel.net/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader/
-        </loc>
-        <lastmod>2014-06-08T19:34:59-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/</loc>
-        <lastmod>2014-06-08T19:35:06-05:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://blog.fretzel.net/blog/2013/03/26/gitorious-slash-redis-installer-updated/
-        </loc>
-        <lastmod>2014-06-08T19:17:40-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo/</loc>
-        <lastmod>2014-06-08T19:42:03-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/blog/2013/12/05/vim-in-all-its-awesomeness/</loc>
-        <lastmod>2014-06-08T19:45:54-05:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/
-        </loc>
-        <lastmod>2014-06-08T19:35:30-05:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/
-        </loc>
-        <lastmod>2014-06-08T19:49:59-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/blog/2014/06/08/new-blog-home-and-software/</loc>
-        <lastmod>2014-06-08T19:58:10-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/</loc>
-        <lastmod>2014-06-08T20:12:16-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/blog/archives/</loc>
-        <lastmod>2014-06-08T20:12:16-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/</loc>
-        <lastmod>2014-06-08T20:12:16-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://blog.fretzel.net/robots.txt</loc>
-        <lastmod>2014-06-07T23:32:25-05:00</lastmod>
-    </url>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2014/06/08/vundle-for-vim/</loc>
+    <lastmod>2014-06-08T20:08:14-05:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2014/06/08/new-blog-home-and-software/</loc>
+    <lastmod>2014-06-08T19:56:51-05:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/</loc>
+    <lastmod>2014-03-05T17:15:43-06:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/</loc>
+    <lastmod>2014-02-21T21:00:00-06:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2013/12/05/vim-in-all-its-awesomeness/</loc>
+    <lastmod>2013-12-05T07:36:29-06:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2013/04/04/git-move-subdirectory-to-new-repo/</loc>
+    <lastmod>2013-04-04T15:08:22-05:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2013/03/26/gitorious-slash-redis-installer-updated/</loc>
+    <lastmod>2013-03-26T16:40:00-05:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2013/03/25/gitorious-and-the-redis-service/</loc>
+    <lastmod>2013-03-25T15:03:09-05:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2013/03/16/my-new-rss-setup-after-the-death-of-google-reader/</loc>
+    <lastmod>2013-03-16T10:25:00-05:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2013/03/04/git-ce-installer-for-rhel-6-dot-x/</loc>
+    <lastmod>2013-03-04T07:36:51-06:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/2013/03/04/svn-to-git/</loc>
+    <lastmod>2013-03-04T07:23:58-06:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  
+  <url>
+    <loc>http://blog.fretzel.net/blog/archives/</loc>
+    <lastmod>2014-06-21T17:48:27-05:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>http://blog.fretzel.net/</loc>
+    <lastmod>2014-06-21T17:48:27-05:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  
 </urlset>

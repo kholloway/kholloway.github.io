@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Vundle | Systems and Automation]]></title>
   <link href="http://blog.fretzel.net/blog/categories/vundle/atom.xml" rel="self"/>
   <link href="http://blog.fretzel.net/"/>
-  <updated>2014-06-08T20:14:35-05:00</updated>
+  <updated>2014-06-21T17:48:27-05:00</updated>
   <id>http://blog.fretzel.net/</id>
   <author>
     <name><![CDATA[Kent Holloway]]></name>
@@ -24,19 +24,18 @@
 
 <p>I&rsquo;m only using a small handful of plugins (shown below)</p>
 
-<p>```
-Bundle &lsquo;SuperTab&rsquo;</p>
+<pre><code>Bundle 'SuperTab'
 
-<p>&ldquo; Repos from GitHub
-Bundle &lsquo;bling/vim-airline&rsquo;
-Bundle &lsquo;tpope/vim-fugitive&rsquo;
-Bundle &lsquo;davidhalter/jedi-vim&rsquo;
-Bundle &lsquo;rodjek/vim-puppet&rsquo;
-Bundle &lsquo;elzr/vim-json&rsquo;</p>
+" Repos from GitHub
+Bundle 'bling/vim-airline'
+Bundle 'tpope/vim-fugitive'
+Bundle 'davidhalter/jedi-vim'
+Bundle 'rodjek/vim-puppet'
+Bundle 'elzr/vim-json'
 
-<p>&ldquo; installed bundles go here
-Bundle &lsquo;Syntastic&rsquo;
-```</p>
+" installed bundles go here
+Bundle 'Syntastic'
+</code></pre>
 
 <p>Vundle has been going through some upgrades lately which is making it even easier to use.</p>
 

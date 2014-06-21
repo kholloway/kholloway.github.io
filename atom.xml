@@ -4,7 +4,7 @@
   <title><![CDATA[Systems and Automation]]></title>
   <link href="http://blog.fretzel.net/atom.xml" rel="self"/>
   <link href="http://blog.fretzel.net/"/>
-  <updated>2014-06-08T20:14:35-05:00</updated>
+  <updated>2014-06-21T17:48:27-05:00</updated>
   <id>http://blog.fretzel.net/</id>
   <author>
     <name><![CDATA[Kent Holloway]]></name>
@@ -262,11 +262,11 @@ imap &lt;F1&gt; &lt;Esc&gt;
 <p>One of my favorite commands once you have Janus installed is to reformat an entire file with a simple keystroke:</p>
 
 <ul>
-<li>&lt;leader>fef formats the entire file</li>
+<li>\&lt;leader>fef formats the entire file</li>
 </ul>
 
 
-<p>The default &lt;leader> character is \ so \fef reformats your current file.
+<p>The default \&lt;leader> character is \ so \fef reformats your current file.
 Stop living in the dark ages, go install Janus right now!</p>
 ]]></content>
   </entry>
@@ -499,7 +499,7 @@ It also does not try to update Puppet when it&rsquo;s already installed.</p>
     <link href="http://blog.fretzel.net/blog/2013/03/04/svn-to-git/"/>
     <updated>2013-03-04T07:23:58-06:00</updated>
     <id>http://blog.fretzel.net/blog/2013/03/04/svn-to-git</id>
-    <content type="html"><![CDATA[<p>SVN &ndash;> Git:</p>
+    <content type="html"><![CDATA[<p>SVN -> Git:</p>
 
 <p> Good post by Makis about how to setup SVN to Git conversions.</p>
 
