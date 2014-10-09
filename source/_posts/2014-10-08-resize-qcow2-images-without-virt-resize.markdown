@@ -24,7 +24,7 @@ It's both of these volumes that I want to expand via libguestfs.
 
 First lets increase the qcow2 image size using the standard *qemu-img* tool, lets add 40GB.
 
-```
+```bash
 qemu-img vmimage.img +40G
 ```
 
@@ -32,7 +32,7 @@ Now using whatever language you like (libguestfs has lots of bindings for variou
 Note that you can do this in the shell/Bash if you like but calculating the proper partition sector start location is a little harder (not impossible just a bit more work).
 Everything below is in Python, copy it to a script or just type along in the Python command line.
 
-```
+```python
 import guestfs
 
 # For return values we want a dict object
@@ -44,31 +44,31 @@ g.launch()
 Lets assume your dev name is **/dev/sda** but you can use the *list_devices* function to find it if you are not sure.
 Now lets get the partition list:
 
-```
+```python
 partitions = g.part_list('/dev/sda')
 ```
 
 We need the start location of partition 2:
 
-```
+```python
 part_start = partitions[1]['part_start']
 ```
 
 Grab the block size of the image:
 
-```
+```python
 blk_size = g.blockdev_getss('/dev/sda')
 ```
 
 Calculate the starting sector by dividing our partition start location by the block size:
 
-```
+```python
 start_sector = part_start / blk_size
 ```
 
 Now the scary part, we need to delete partition 2:
 
-```
+```python
 g.part_del('/dev/sda', 2)
 ```
 
@@ -76,7 +76,7 @@ Ok great the partition is gone, lets create a new one now with the info we gathe
 The '-1' bit below tells libguestfs that you want the last sector as your end sector.
 This is a nice shortcut so you don't need to calculate it yourself:
 
-```
+```python
 try:
   g.part_add('/dev/sda', 'p', start_sector, -1)
 except RuntimeError as msg:
@@ -86,7 +86,7 @@ except RuntimeError as msg:
 As noted above because the partition table can't be re-read by the kernel you will get an error message.
 This is ok, to resolve this lets just stop and restart the libguestfs system to force it to reload the partition table:
 
-```
+```python
 g.shutdown()
 g.add_drive_opts('vmimage.img')
 g.launch()
@@ -94,14 +94,14 @@ g.launch()
 
 Ok now we can resize the PV inside the partition we just expanded:
 
-```
+```python
 g.pvresize('/dev/sda2')
 ```
 
 Now in this case I know the exact volume names but if you didn't know it you can use the *lvs* function in libguestfs to list them.
 Since I know them already I'm just going to include it in the command below which takes my swap volume from whatever it was (2GB previously) to 6GB now.
 
-```
+```python
 g.lvresize('/dev/vgroot/swap.vol', 6144)
 ```
 
@@ -110,20 +110,20 @@ Lets expand the root volume with any remaining space in the PV.
 This uses a slightly different guestfs command that fills free space with a percentage number.
 For my particular use case I just want to fill all remaining space or 100% remaining space as shown below:
 
-```
+```python
 g.lvresize_free('/dev/vgroot/root.fs', 100)
 ```
 
 Last steps, lets resize the actual filesystem on the root volume and then check it to make sure everything is OK:
 
-```
+```python
 g.resize2fs('/dev/vgroot/root.fs')
 g.e2fsck('/dev/vgroot/root.fs', correct=True)
 ```
 
 Now shutdown the guestfs process since we are all done:
 
-```
+```python
 g.shutdown()
 g.close()
 ```
