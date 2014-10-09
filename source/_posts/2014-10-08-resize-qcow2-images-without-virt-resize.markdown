@@ -24,7 +24,9 @@ It's both of these volumes that I want to expand via libguestfs.
 
 First lets increase the qcow2 image size using the standard *qemu-img* tool, lets add 40GB.
 
-```qemu-img vmimage.img +40G```
+```
+qemu-img vmimage.img +40G
+```
 
 Now using whatever language you like (libguestfs has lots of bindings for various languages) fire up the guestfs back end.
 Note that you can do this in the shell/Bash if you like but calculating the proper partition sector start location is a little harder (not impossible just a bit more work).
@@ -42,23 +44,33 @@ g.launch()
 Lets assume your dev name is **/dev/sda** but you can use the *list_devices* function to find it if you are not sure.
 Now lets get the partition list:
 
-```partitions = g.part_list('/dev/sda')```
+```
+partitions = g.part_list('/dev/sda')
+```
 
 We need the start location of partition 2:
 
-```part_start = partitions[1]['part_start']```
+```
+part_start = partitions[1]['part_start']
+```
 
 Grab the block size of the image:
 
-```blk_size = g.blockdev_getss(dev)```
+```
+blk_size = g.blockdev_getss('/dev/sda')
+```
 
 Calculate the starting sector by dividing our partition start location by the block size:
 
-```start_sector = part_start / blk_size```
+```
+start_sector = part_start / blk_size
+```
 
 Now the scary part, we need to delete partition 2:
 
-```g.part_del('/dev/sda', 2)```
+```
+g.part_del('/dev/sda', 2)
+```
 
 Ok great the partition is gone, lets create a new one now with the info we gathered above.
 The '-1' bit below tells libguestfs that you want the last sector as your end sector.
