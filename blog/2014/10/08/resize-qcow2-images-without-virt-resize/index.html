@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Resize Qcow2 Images Without Virt-resize - Systems and Automation</title>
+  <meta name="author" content="Kent Holloway">
+
+  
+  <meta name="description" content="I&rsquo;m in the process of switching from kickstart builds for new VM&rsquo;s to image based clones.
+I needed to find a simple way to add space to a &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.fretzel.net/blog/2014/10/08/resize-qcow2-images-without-virt-resize">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Systems and Automation" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-51741075-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Systems and Automation</a></h1>
+  
+    <h2>stuff I like</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.fretzel.net" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Resize Qcow2 Images Without Virt-resize</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-10-08T20:52:54-05:00" pubdate data-updated="true">Oct 8<sup>th</sup>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&rsquo;m in the process of switching from kickstart builds for new VM&rsquo;s to image based clones.
+I needed to find a simple way to add space to a qcow2 image file along with one of the partitions in it and the volumes it contained.
+Most of the guides I found used <em>virt-resize</em> to resize the image.
+While <em>virt-resize</em> makes resizing qcow2 images really easy it has the side affect of making sparse images into non-spare images.
+This can end up using a considerable amount of space depending on how much additional space you are adding.
+The rest of the options I found have you converting qcow2 to raw and then back again which is slow and also can consume large amounts of space.</p>
+
+<p><a href="http://libguestfs.org/guestfs.3.html">Libguestfs</a> to the rescue!</p>
+
+<p>Now there are a few requirements, namely this only works if the partition you want to modify is either the last partition or the only partition and you need to do this all while the VM is shutdown.
+In my case it&rsquo;s the last partition I need to expand, the disk layout has boot at partition 1 and partition 2 contains two LVM volumes.
+It&rsquo;s both of these volumes that I want to expand via libguestfs.</p>
+
+<p><a href="https://gist.github.com/kholloway/ded725ea321ce8fe79c7">full gist available here</a> with some error checking and a few more options.</p>
+
+<h4>Lets go!</h4>
+
+<p>First lets increase the qcow2 image size using the standard <em>qemu-img</em> tool, lets add 40GB.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>qemu-img vmimage.img +40G
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now using whatever language you like (libguestfs has lots of bindings for various languages) fire up the guestfs back end.
+Note that you can do this in the shell/Bash if you like but calculating the proper partition sector start location is a little harder (not impossible just a bit more work).
+Everything below is in Python, copy it to a script or just type along in the Python command line.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">guestfs</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># For return values we want a dict object</span>
+</span><span class='line'><span class="n">g</span> <span class="o">=</span> <span class="n">guestfs</span><span class="o">.</span><span class="n">GuestFS</span><span class="p">(</span><span class="n">python_return_dict</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">add_drive_opts</span><span class="p">(</span><span class="s">&#39;vmimage.img&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lets assume your dev name is <strong>/dev/sda</strong> but you can use the <em>list_devices</em> function to find it if you are not sure.
+Now lets get the partition list:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">partitions</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">part_list</span><span class="p">(</span><span class="s">&#39;/dev/sda&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We need the start location of partition 2:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">part_start</span> <span class="o">=</span> <span class="n">partitions</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;part_start&#39;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Grab the block size of the image:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">blk_size</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">blockdev_getss</span><span class="p">(</span><span class="s">&#39;/dev/sda&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Calculate the starting sector by dividing our partition start location by the block size:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">start_sector</span> <span class="o">=</span> <span class="n">part_start</span> <span class="o">/</span> <span class="n">blk_size</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now the scary part, we need to delete partition 2:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">part_del</span><span class="p">(</span><span class="s">&#39;/dev/sda&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok great the partition is gone, lets create a new one now with the info we gathered above.
+The &lsquo;-1&rsquo; bit below tells libguestfs that you want the last sector as your end sector.
+This is a nice shortcut so you don&rsquo;t need to calculate it yourself:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">try</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">g</span><span class="o">.</span><span class="n">part_add</span><span class="p">(</span><span class="s">&#39;/dev/sda&#39;</span><span class="p">,</span> <span class="s">&#39;p&#39;</span><span class="p">,</span> <span class="n">start_sector</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+</span><span class='line'>  <span class="k">print</span> <span class="s">&quot;Part add failed due to re-read of partition table, this is normal and expected.. Ignored..&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As noted above because the partition table can&rsquo;t be re-read by the kernel you will get an error message.
+This is ok, to resolve this lets just stop and restart the libguestfs system to force it to reload the partition table:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</span><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">add_drive_opts</span><span class="p">(</span><span class="s">&#39;vmimage.img&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok now we can resize the PV inside the partition we just expanded:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">pvresize</span><span class="p">(</span><span class="s">&#39;/dev/sda2&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now in this case I know the exact volume names but if you didn&rsquo;t know it you can use the <em>lvs</em> function in libguestfs to list them.
+Since I know them already I&rsquo;m just going to include it in the command below which takes my swap volume from whatever it was (2GB previously) to 6GB now.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">lvresize</span><span class="p">(</span><span class="s">&#39;/dev/vgroot/swap.vol&#39;</span><span class="p">,</span> <span class="mi">6144</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok great, swap vol is now 6GB!
+Lets expand the root volume with any remaining space in the PV.
+This uses a slightly different guestfs command that fills free space with a percentage number.
+For my particular use case I just want to fill all remaining space or 100% remaining space as shown below:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">lvresize_free</span><span class="p">(</span><span class="s">&#39;/dev/vgroot/root.fs&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Last steps, lets resize the actual filesystem on the root volume and then check it to make sure everything is OK:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">resize2fs</span><span class="p">(</span><span class="s">&#39;/dev/vgroot/root.fs&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">e2fsck</span><span class="p">(</span><span class="s">&#39;/dev/vgroot/root.fs&#39;</span><span class="p">,</span> <span class="n">correct</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now shutdown the guestfs process since we are all done:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</span><span class='line'><span class="n">g</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s it!
+Looks hard but it&rsquo;s pretty simple, the hardest part is calulating your proper start sector.
+Now go boot up your VM and you will find that swap has increased to 6GB and your root volume has an additional 34GB of space in it!</p>
+
+<p>This all happens in less than a minute if you script/automate it all and doesn&rsquo;t have any of the conversion or sparse to non-sparse issues that virt-resize has.</p>
+
+<p>Enjoy!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Kent Holloway</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-10-08T20:52:54-05:00" pubdate data-updated="true">Oct 8<sup>th</sup>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/qemu/'>qemu</a>, <a class='category' href='/blog/categories/rhel/'>rhel</a>, <a class='category' href='/blog/categories/virt/'>virt</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.fretzel.net/blog/2014/10/08/resize-qcow2-images-without-virt-resize/" data-via="" data-counturl="http://blog.fretzel.net/blog/2014/10/08/resize-qcow2-images-without-virt-resize/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/06/08/vundle-for-vim/" title="Previous Post: Vundle for Vim">&laquo; Vundle for Vim</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/10/08/resize-qcow2-images-without-virt-resize/">Resize Qcow2 Images Without Virt-resize</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/08/vundle-for-vim/">Vundle for Vim</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/08/new-blog-home-and-software/">New Blog Home and Software</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/03/05/audio-fingerprinting-on-raspberry-pi-part-1/">Audio Fingerprinting on Raspberry Pi (Part 1)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/21/multi-master-puppet-setup-with-dns-srv-records/">Multi-master Puppet Setup With DNS SRV Records</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/kholloway">@kholloway</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kholloway',
+            count: 2,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:sanity">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "sanity"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+
+<section>
+  <h1>Top Categories</h1>
+    <ul id="top-category-list"><li><a href='/blog/categories/git'>git (5)</a></li><li><a href='/blog/categories/gitorious'>gitorious (4)</a></li><li><a href='/blog/categories/rhel'>rhel (4)</a></li><li><a href='/blog/categories/redhat'>redhat (3)</a></li><li><a href='/blog/categories/redis'>redis (2)</a></li><li><a href='/blog/categories/vim'>vim (2)</a></li><li><a href='/blog/categories/janus'>janus (1)</a></li><li><a href='/blog/categories/ruby'>ruby (1)</a></li><li><a href='/blog/categories/puppet'>puppet (1)</a></li><li><a href='/blog/categories/python'>python (1)</a></li></ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Kent Holloway -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'sysat';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.fretzel.net/blog/2014/10/08/resize-qcow2-images-without-virt-resize/';
+        var disqus_url = 'http://blog.fretzel.net/blog/2014/10/08/resize-qcow2-images-without-virt-resize/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
