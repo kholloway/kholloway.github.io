@@ -25,7 +25,7 @@ It's both of these volumes that I want to expand via libguestfs.
 First lets increase the qcow2 image size using the standard *qemu-img* tool, lets add 40GB.
 
 ```bash
-qemu-img vmimage.img +40G
+qemu-img resize vmimage.img +40G
 ```
 
 Now using whatever language you like (libguestfs has lots of bindings for various languages) fire up the guestfs back end.
