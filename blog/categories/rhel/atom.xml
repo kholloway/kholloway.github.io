@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Rhel | Systems and Automation]]></title>
   <link href="http://blog.fretzel.net/blog/categories/rhel/atom.xml" rel="self"/>
   <link href="http://blog.fretzel.net/"/>
-  <updated>2014-10-08T22:14:04-05:00</updated>
+  <updated>2014-10-09T14:43:33-05:00</updated>
   <id>http://blog.fretzel.net/</id>
   <author>
     <name><![CDATA[Kent Holloway]]></name>
@@ -37,7 +37,7 @@ It&rsquo;s both of these volumes that I want to expand via libguestfs.</p>
 
 <p>First lets increase the qcow2 image size using the standard <em>qemu-img</em> tool, lets add 40GB.</p>
 
-<pre><code class="bash">qemu-img vmimage.img +40G
+<pre><code class="bash">qemu-img resize vmimage.img +40G
 </code></pre>
 
 <p>Now using whatever language you like (libguestfs has lots of bindings for various languages) fire up the guestfs back end.
